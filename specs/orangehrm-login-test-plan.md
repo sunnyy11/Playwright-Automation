@@ -1,79 +1,121 @@
-# OrangeHRM login page test plan
+# OrangeHRM Add Admin User Test Plan
 
 ## Application Overview
 
-OrangeHRM login page validation covering the core authentication flows, required-field behavior, and error handling on a fresh browser session.
+Test coverage for logging into the public OrangeHRM demo, navigating to Admin > User Management, opening Add User, and creating an enabled Admin account with a valid employee association. The plan includes the requested happy path and independent negative and boundary scenarios. Each scenario starts from a fresh browser state and uses the seed setup in tests/seed.spec.ts.
 
 ## Test Scenarios
 
-### 1. Login page core scenarios
+### 1. OrangeHRM User Management
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 1.1. Successful login with valid credentials
+#### 1.1. Create an enabled Admin user with valid details
 
-**File:** `tests/login/login-success.spec.ts`
-
-**Steps:**
-  1. Navigate to the OrangeHRM login page on a fresh browser session.
-    - expect: The page loads with the username field, password field, and Login button visible.
-  2. Enter the valid username 'Admin' and password 'admin123'.
-    - expect: Both fields accept the input without error styling or blocking.
-  3. Click the Login button.
-    - expect: The user is redirected to the dashboard page, and the browser URL changes from /auth/login to a dashboard route.
-  4. Confirm the main dashboard content is visible after login.
-    - expect: The dashboard loads successfully and the user is authenticated.
-
-#### 1.2. Login with empty credentials shows validation error
-
-**File:** `tests/login/login-empty-fields.spec.ts`
+**File:** `tests/admin/create-enabled-admin-user.spec.ts`
 
 **Steps:**
-  1. Open the login page in a fresh state.
-    - expect: The username and password fields are empty, and the Login button is enabled.
-  2. Leave both fields blank and click Login.
-    - expect: The page remains on the login screen, and user-friendly validation messages appear for required fields.
-  3. Check the field states after submission.
-    - expect: The empty required fields are highlighted or display validation feedback, and no dashboard navigation occurs.
+  1. Open https://opensource-demo.orangehrmlive.com/web/index.php/auth/login.
+    - expect: The OrangeHRM Login page is displayed with Username, Password, and Login controls.
+  2. Enter `Admin` in Username and `admin123` in Password, then click Login.
+    - expect: The user is authenticated and the Dashboard page is displayed.
+  3. Click the `Admin` menu item in the left navigation panel.
+    - expect: The Admin / User Management page is displayed with the System Users heading.
+  4. Click the `Add` button.
+    - expect: The Add User form is displayed with required fields for User Role, Employee Name, Status, Username, Password, and Confirm Password.
+  5. Open User Role and select `Admin`.
+    - expect: The User Role field displays `Admin`.
+  6. Type an existing employee name into Employee Name, then select an employee from the autocomplete suggestions.
+    - expect: The selected employee name is populated from the autocomplete list.
+  7. Open Status and select `Enabled`.
+    - expect: The Status field displays `Enabled`.
+  8. Enter `Admin11` as Username, `Pass123` as Password, and `Pass123` as Confirm Password.
+    - expect: All entered values are retained; the two password values match.
+  9. Click Save.
+    - expect: The user is saved successfully, the Add User form closes or redirects to the System Users list, and a success confirmation is displayed. The new username `Admin11` is listed when the user list is refreshed or searched.
 
-#### 1.3. Login with invalid username or password is rejected
+#### 1.2. Reject submission when required Add User fields are empty
 
-**File:** `tests/login/login-invalid-credentials.spec.ts`
-
-**Steps:**
-  1. Navigate to the login page and enter a valid-looking username with an incorrect password, such as 'Admin' and 'wrongpass'.
-    - expect: The text inputs accept the values without a page crash.
-  2. Click Login.
-    - expect: The login attempt fails and the user remains on the login page.
-  3. Inspect the feedback message or error banner.
-    - expect: An authentication error message explains that the credentials are invalid or the account cannot be found.
-  4. Verify no redirect occurs.
-    - expect: The URL still reflects the login route rather than the dashboard.
-
-#### 1.4. Login with only one required field filled
-
-**File:** `tests/login/login-partial-fields.spec.ts`
+**File:** `tests/admin/add-user-required-fields.spec.ts`
 
 **Steps:**
-  1. Start from a fresh login page.
-    - expect: The page is loaded and both input fields are visible.
-  2. Enter a valid username and leave the password empty, then click Login.
-    - expect: The form prevents submission and shows a password-required validation error.
-  3. Clear the username, enter a password only, and click Login again.
-    - expect: The form prevents submission and shows a username-required validation error.
-  4. Confirm the page stays on the login screen after both attempts.
-    - expect: No dashboard page is opened when either required field is missing.
+  1. Open the login page, log in with `Admin` / `admin123`, select Admin from the left navigation, and click Add.
+    - expect: The Add User form is displayed.
+  2. Leave every required field empty and click Save.
+    - expect: The form remains open and validation messages are displayed for User Role, Employee Name, Status, Username, Password, and Confirm Password. No user is created.
+  3. Fill only one required field at a time and click Save after each attempt.
+    - expect: Validation remains for every other missing required field and no partial submission is accepted.
 
-#### 1.5. Password field masking and input handling
+#### 1.3. Reject a password confirmation mismatch
 
-**File:** `tests/login/login-password-behavior.spec.ts`
+**File:** `tests/admin/add-user-password-validation.spec.ts`
 
 **Steps:**
-  1. Open the login page in a fresh browser session.
-    - expect: The password input is visible and displays a masked password entry field.
-  2. Type a sample password like 'admin123' into the password field.
-    - expect: The entered characters are hidden from direct view while still being accepted by the field.
-  3. Move focus away and back to the password field.
-    - expect: The field retains the value and does not clear unexpectedly.
-  4. Submit with a valid username and the entered password.
-    - expect: The login succeeds when the correct credentials are used, confirming the field behaves correctly during input and submission.
+  1. Log in, open Admin > User Management > Add, select User Role `Admin`, select a valid employee from Employee Name autocomplete, and select Status `Enabled`.
+    - expect: The form contains valid values for all non-password required fields.
+  2. Enter a valid username, enter `Pass123` in Password, enter a different value such as `Pass124` in Confirm Password, and click Save.
+    - expect: A password-mismatch validation message is displayed, the form remains open, and no user is created.
+  3. Replace Confirm Password with `Pass123` and click Save.
+    - expect: The mismatch validation clears and the submission proceeds to the normal save result, subject to username uniqueness.
+
+#### 1.4. Reject creation when the username already exists
+
+**File:** `tests/admin/add-user-duplicate-username.spec.ts`
+
+**Steps:**
+  1. Log in and open the Add User form through Admin > User Management > Add.
+    - expect: The Add User form is displayed.
+  2. Complete the form with a valid Admin role, valid employee selection, Enabled status, and a username already present in System Users, then enter matching passwords.
+    - expect: All fields accept the supplied values.
+  3. Click Save.
+    - expect: A duplicate-username validation or error is displayed, the form is not successfully submitted, and the existing account is not overwritten.
+
+#### 1.5. Require a valid employee selected from autocomplete
+
+**File:** `tests/admin/add-user-employee-autocomplete.spec.ts`
+
+**Steps:**
+  1. Log in and open the Add User form through Admin > User Management > Add.
+    - expect: The Add User form is displayed.
+  2. Type a search string that returns employee suggestions in Employee Name, such as `a`.
+    - expect: A suggestion list appears with matching employee names.
+  3. Enter arbitrary text that does not correspond to a suggestion, complete the other fields with valid values, and click Save.
+    - expect: The employee field is rejected or marked invalid, the form remains open, and no user is created.
+  4. Clear the field, type a matching search, and select one suggestion.
+    - expect: The selected employee is accepted as the field value and the employee validation clears.
+
+#### 1.6. Persist the selected role and status values independently
+
+**File:** `tests/admin/add-user-role-status.spec.ts`
+
+**Steps:**
+  1. Log in and open the Add User form.
+    - expect: The User Role and Status fields initially show `-- Select --`.
+  2. Open User Role and verify the available values; select `ESS`, then reopen it and select `Admin`.
+    - expect: The dropdown offers `Admin` and `ESS`, and the final displayed value is `Admin`.
+  3. Open Status and verify the available values; select `Disabled`, then reopen it and select `Enabled`.
+    - expect: The dropdown offers `Enabled` and `Disabled`, and the final displayed value is `Enabled`.
+  4. Complete the remaining required fields with valid data and save.
+    - expect: The saved user retains the final selections: role `Admin` and status `Enabled`.
+
+#### 1.7. Enforce username and password boundary validation
+
+**File:** `tests/admin/add-user-field-boundaries.spec.ts`
+
+**Steps:**
+  1. Log in and open the Add User form, then select a valid role, employee, and status.
+    - expect: The non-text required fields are valid.
+  2. Try submitting with a blank username, a username containing only spaces, and a username exceeding the allowed maximum length.
+    - expect: Each invalid username is rejected with clear validation and no user is created.
+  3. Try a password below the minimum policy, then use a password containing the required complexity for the environment and matching confirmation.
+    - expect: Weak passwords are rejected or marked invalid according to the displayed password policy; a compliant matching password is accepted.
+
+#### 1.8. Cancel Add User without creating an account
+
+**File:** `tests/admin/add-user-cancel.spec.ts`
+
+**Steps:**
+  1. Log in, navigate to Admin > User Management, and click Add.
+    - expect: The Add User form is displayed.
+  2. Enter values in one or more fields, then click Cancel.
+    - expect: The user returns to the System Users page, entered values are discarded, and no new user is listed.
