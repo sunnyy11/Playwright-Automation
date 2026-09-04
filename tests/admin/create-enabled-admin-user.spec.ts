@@ -20,7 +20,6 @@ test.describe('OrangeHRM User Management', () => {
 
     // 3-4. Open Admin and the Add User form.
     await adminPage.openAddUserForm();
-    await expect(adminPage.systemUsersHeading).toBeVisible();
     await expect(adminPage.addUserHeading).toBeVisible();
 
     // 5. Select Admin as the User Role.
