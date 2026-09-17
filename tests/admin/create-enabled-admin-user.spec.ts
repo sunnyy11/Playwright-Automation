@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures/pom.fixture';
+import { expect, test } from '../../fixtures/pom.fixture';
 import { credentials } from '../../config';
 import { faker } from '@faker-js/faker';
 

@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/pom.fixture';
+import { test, expect } from '../../fixtures/pom.fixture';
 import { credentials } from '../../config';
 
 test.describe('Login page core scenarios', () => {
