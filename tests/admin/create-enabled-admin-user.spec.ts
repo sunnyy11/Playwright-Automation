@@ -1,19 +1,18 @@
-import { expect, test } from '@playwright/test';
-import { AdminPage } from '../pages/admin.page';
-import { LoginPage } from '../pages/login.page';
+import { expect, test } from '../fixtures/pom.fixture';
+import { credentials } from '../../config';
+import { faker } from '@faker-js/faker';
 
 test.describe('OrangeHRM User Management', () => {
-  test('Create an enabled Admin user with valid details', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const adminPage = new AdminPage(page);
-    const username = `Admin${Date.now()}`;
+  test('Create an enabled Admin user with valid details', async ({ page, loginPage, adminPage }) => {
+    const username = faker.internet.username();
+    const password = `Pw${faker.string.alphanumeric(10)}!`;
 
     // 1. Open the OrangeHRM login page.
     await loginPage.goto();
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
 
     // 2. Enter Admin credentials and log in.
-    await loginPage.login('Admin', 'admin123');
+    await loginPage.login(credentials.username, credentials.password);
     await loginPage.submit();
     await expect(page).toHaveURL(/dashboard\/index/);
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
@@ -26,7 +25,7 @@ test.describe('OrangeHRM User Management', () => {
     await adminPage.selectUserRole('Admin');
     await expect(adminPage.userRoleSelect).toHaveText('Admin');
 
-    // 6. Select an existing employee from autocomplete suggestions.
+    // 6. Select a valid employee record required by OrangeHRM.
     await adminPage.selectEmployee('Ranga', 'Ranga Akunuri');
     await expect(adminPage.employeeNameInput).toHaveValue(/Ranga\s+Akunuri/);
 
@@ -35,10 +34,10 @@ test.describe('OrangeHRM User Management', () => {
     await expect(adminPage.statusSelect).toHaveText('Enabled');
 
     // 8. Enter username, password, and matching confirmation.
-    await adminPage.fillUserCredentials(username, 'Pass123');
+    await adminPage.fillUserCredentials(username, password);
     await expect(adminPage.usernameInput).toHaveValue(username);
-    await expect(adminPage.passwordInput).toHaveValue('Pass123');
-    await expect(adminPage.confirmPasswordInput).toHaveValue('Pass123');
+    await expect(adminPage.passwordInput).toHaveValue(password);
+    await expect(adminPage.confirmPasswordInput).toHaveValue(password);
 
     // 9. Save the new Admin user.
     await adminPage.saveUser();
