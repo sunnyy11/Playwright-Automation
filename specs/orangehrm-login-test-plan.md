@@ -2,13 +2,11 @@
 
 ## Application Overview
 
-Test coverage for logging into the public OrangeHRM demo, navigating to Admin > User Management, opening Add User, and creating an enabled Admin account with a valid employee association. The plan includes the requested happy path and independent negative and boundary scenarios. Each scenario starts from a fresh browser state and uses the seed setup in tests/seed.spec.ts.
+Test coverage for logging into the public OrangeHRM demo, navigating to Admin > User Management, opening Add User, and creating an enabled Admin account with a valid employee association. The plan includes the requested happy path and independent negative and boundary scenarios. Each scenario starts from a fresh browser state.
 
 ## Test Scenarios
 
 ### 1. OrangeHRM User Management
-
-**Seed:** `tests/seed.spec.ts`
 
 #### 1.1. Create an enabled Admin user with valid details
 

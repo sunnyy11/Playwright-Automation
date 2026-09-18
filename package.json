@@ -1,17 +1,38 @@
 {
-  "name": "playwright",
+  "name": "orangehrm-playwright",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playwright end-to-end tests for OrangeHRM",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "lint": "eslint .",
+    "format": "prettier --write \"config.ts\" \"pages/**/*.ts\" \"fixtures/**/*.ts\" \"tests/**/*.ts\" \"playwright.config.ts\" \"eslint.config.mjs\" \"package.json\" \"tsconfig.json\" \"README.md\" \".prettierrc\"",
+    "format:check": "prettier --check \"config.ts\" \"pages/**/*.ts\" \"fixtures/**/*.ts\" \"tests/**/*.ts\" \"playwright.config.ts\" \"eslint.config.mjs\" \"package.json\" \"tsconfig.json\" \"README.md\" \".prettierrc\"",
+    "typecheck": "tsc --noEmit"
+  },
   "keywords": [],
-  "author": "",
+  "author": "QA Engineering",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.1.2",
-    "dotenv": "^17.2.2"
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "dotenv": "^17.2.2",
+    "eslint": "^9.35.0",
+    "eslint-plugin-playwright": "^2.2.2",
+    "globals": "^17.12.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
   }
 }
