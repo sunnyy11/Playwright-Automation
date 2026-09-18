@@ -8,13 +8,7 @@
     "noImplicitOverride": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "ignoreDeprecations": "5.0",
-    "types": ["node", "@playwright/test"],
-    "baseUrl": ".",
-    "paths": {
-      "@pages/*": ["pages/*"],
-      "@fixtures/*": ["fixtures/*"]
-    }
+    "types": ["node", "@playwright/test"]
   },
   "include": [
     "config.ts",
